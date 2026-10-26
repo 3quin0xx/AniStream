@@ -2,8 +2,6 @@ package com.portolan.anistream.data.models
 
 import com.google.gson.annotations.SerializedName
 
-// ─── AniList results ─────────────────────────────────────────────────────────
-
 data class AniListResult(
     @SerializedName("currentPage") val currentPage: Int = 1,
     @SerializedName("hasNextPage") val hasNextPage: Boolean = false,
@@ -54,15 +52,13 @@ data class AniListAnimeInfo(
 )
 
 data class AniListEpisode(
-    @SerializedName("id") val id: String,           // gogoanime episode ID for streaming
+    @SerializedName("id") val id: String,
     @SerializedName("title") val title: String?,
     @SerializedName("description") val description: String?,
     @SerializedName("number") val number: Int,
     @SerializedName("image") val image: String?,
     @SerializedName("airDate") val airDate: String?
 )
-
-// ─── Direct gogoanime ────────────────────────────────────────────────────────
 
 data class AnimeInfo(
     @SerializedName("id") val id: String,
@@ -81,8 +77,6 @@ data class EpisodeInfo(
     @SerializedName("url") val url: String?
 )
 
-// ─── Stream links ────────────────────────────────────────────────────────────
-
 data class StreamResponse(
     @SerializedName("headers") val headers: Map<String, String>?,
     @SerializedName("sources") val sources: List<StreamSource>?,
@@ -91,15 +85,33 @@ data class StreamResponse(
 
 data class StreamSource(
     @SerializedName("url") val url: String,
-    @SerializedName("isM3U8") val isM3U8: Boolean,
-    @SerializedName("quality") val quality: String?
+    @SerializedName("isM3U8") val isM3U8: Boolean = true,
+    @SerializedName("quality") val quality: String?,
+    val referer: String? = null,
+    val provider: String? = null
 ) {
-    fun qualityRank(): Int = when (quality) {
-        "1080p" -> 1080; "720p" -> 720; "480p" -> 480; "360p" -> 360; else -> 0
+    fun normalizedQuality(): String {
+        val q = quality?.lowercase()?.trim() ?: ""
+        return when {
+            q.contains("1080") || q.contains("fhd") -> "1080p"
+            q.contains("720") || q.contains("hd") -> "720p"
+            q.contains("default") || q.contains("auto") || q.contains("master") || q.isEmpty() -> "Auto"
+            q.contains("480") -> "480p"
+            q.contains("360") -> "360p"
+            else -> quality ?: "Auto"
+        }
+    }
+
+    /** Prioritizes 1080p first, then 720p, then Auto */
+    fun qualityRank(): Int = when (normalizedQuality()) {
+        "1080p" -> 1080
+        "720p"  -> 720
+        "Auto"  -> 500
+        "480p"  -> 480
+        "360p"  -> 360
+        else    -> 100
     }
 }
-
-// ─── Recent episodes ─────────────────────────────────────────────────────────
 
 data class RecentEpisodesResult(
     @SerializedName("currentPage") val currentPage: Int = 1,
@@ -116,8 +128,6 @@ data class RecentEpisode(
     @SerializedName("url") val url: String?
 )
 
-// ─── AniSkip ─────────────────────────────────────────────────────────────────
-
 data class SkipTimeResponse(
     @SerializedName("found") val found: Boolean,
     @SerializedName("results") val results: List<SkipTimeResult>?,
@@ -126,7 +136,7 @@ data class SkipTimeResponse(
 
 data class SkipTimeResult(
     @SerializedName("interval") val interval: SkipInterval,
-    @SerializedName("skipType") val skipType: String,   // "op", "ed", "recap", "mixed-op"
+    @SerializedName("skipType") val skipType: String,
     @SerializedName("skipId") val skipId: String,
     @SerializedName("episodeLength") val episodeLength: Double
 )
@@ -136,12 +146,10 @@ data class SkipInterval(
     @SerializedName("endTime") val endTime: Double
 )
 
-// ─── UI wrapper ──────────────────────────────────────────────────────────────
-
-/** Common episode model used in the UI layer — wraps both AniListEpisode and EpisodeInfo */
 data class EpisodeItem(
-    val id: String,         // gogoanime streaming ID
+    val id: String,
     val number: Int,
     val title: String?,
-    val image: String?
+    val image: String?,
+    val provider: String = "animepahe"
 )

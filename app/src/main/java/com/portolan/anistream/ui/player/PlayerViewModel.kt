@@ -27,23 +27,27 @@ class PlayerViewModel(app: Application) : AndroidViewModel(app) {
 
     var episodeId = ""; var animeId = ""; var animeTitle = ""
     var animeImage: String? = null; var episodeNumber = 1
-    var subOrDub = "sub"; var malId = -1
+    var subOrDub = "sub"; var malId = -1; var provider = "animepahe"
 
     fun loadEpisode(
         epId: String, malId_: Int, epNum: Int,
-        anId: String, anTitle: String, anImage: String?, sod: String
+        anId: String, anTitle: String, anImage: String?, sod: String, prov: String = "animepahe"
     ) {
         episodeId = epId; malId = malId_; episodeNumber = epNum
-        animeId = anId; animeTitle = anTitle; animeImage = anImage; subOrDub = sod
+        animeId = anId; animeTitle = anTitle; animeImage = anImage
+        subOrDub = sod; provider = prov
 
         viewModelScope.launch {
             _loading.value = true
             _error.value = null
             _savedProgress.value = repo.getEpisodeProgress(epId)
             try {
-                val resp = repo.getStreamLinks(epId)
-                val sorted = resp.sources?.sortedByDescending { it.qualityRank() } ?: emptyList()
-                _sources.value = sorted
+                val list = repo.getHighDefStreams(epId, prov, sod == "dub")
+                if (list.isEmpty()) {
+                    _error.value = "No 1080p/720p streams found across providers"
+                } else {
+                    _sources.value = list
+                }
             } catch (e: Exception) {
                 _error.value = "Could not load stream: ${e.message}"
             }

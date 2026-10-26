@@ -8,11 +8,10 @@ import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
 
-    // Public Consumet instance — change to your own if needed
     private const val CONSUMET_URL = "https://api.consumet.org/"
     private const val ANISKIP_URL  = "https://api.aniskip.com/"
 
-    private val httpClient = OkHttpClient.Builder()
+    val httpClient: OkHttpClient = OkHttpClient.Builder()
         .connectTimeout(30, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)
         .writeTimeout(30, TimeUnit.SECONDS)

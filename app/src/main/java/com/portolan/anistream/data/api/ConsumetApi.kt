@@ -7,7 +7,6 @@ import retrofit2.http.Query
 
 interface ConsumetApi {
 
-    // ── AniList meta (trending, popular, search, detail) ──────────────────
     @GET("meta/anilist/trending")
     suspend fun getTrending(
         @Query("page") page: Int = 1,
@@ -26,33 +25,48 @@ interface ConsumetApi {
         @Query("page") page: Int = 1
     ): AniListResult
 
-    /**
-     * Returns AniList info PLUS episodes with gogoanime streaming IDs.
-     * provider=gogoanime maps AniList → gogoanime for episode IDs.
-     */
     @GET("meta/anilist/info/{id}")
     suspend fun getAniListInfo(
         @Path("id") id: String,
-        @Query("provider") provider: String = "gogoanime"
+        @Query("provider") provider: String = "animepahe",
+        @Query("dub") dub: Boolean = false
     ): AniListAnimeInfo
 
-    // ── Direct gogoanime (for dub episodes) ───────────────────────────────
+    @GET("meta/anilist/watch/{episodeId}")
+    suspend fun getMetaStreamLinks(
+        @Path(value = "episodeId", encoded = true) episodeId: String,
+        @Query("provider") provider: String = "animepahe",
+        @Query("dub") dub: Boolean = false
+    ): StreamResponse
+
+    @GET("anime/{provider}/watch/{episodeId}")
+    suspend fun getProviderStreamPath(
+        @Path("provider") provider: String,
+        @Path(value = "episodeId", encoded = true) episodeId: String,
+        @Query("server") server: String? = null
+    ): StreamResponse
+
+    @GET("anime/{provider}/watch")
+    suspend fun getProviderStreamQuery(
+        @Path("provider") provider: String,
+        @Query("episodeId") episodeId: String,
+        @Query("server") server: String? = null
+    ): StreamResponse
+
     @GET("anime/gogoanime/info/{id}")
     suspend fun getAnimeInfo(
         @Path("id") id: String
     ): AnimeInfo
 
-    // ── Stream links ──────────────────────────────────────────────────────
     @GET("anime/gogoanime/watch/{episodeId}")
     suspend fun getStreamLinks(
         @Path("episodeId") episodeId: String,
         @Query("server") server: String = "gogocdn"
     ): StreamResponse
 
-    // ── Recent episodes ───────────────────────────────────────────────────
     @GET("anime/gogoanime/recent-episodes")
     suspend fun getRecentEpisodes(
         @Query("page") page: Int = 1,
-        @Query("type") type: Int = 1    // 1=sub, 2=dub
+        @Query("type") type: Int = 1
     ): RecentEpisodesResult
 }
