@@ -4,7 +4,6 @@ import android.content.Context
 import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
-import com.google.gson.JsonParser
 import com.portolan.anistream.data.api.RetrofitClient
 import com.portolan.anistream.data.db.AppDatabase
 import com.portolan.anistream.data.db.WatchHistory
@@ -34,10 +33,10 @@ class AnimeRepository(context: Context) {
         }
 
         private const val PAGE_MEDIA_QUERY = """
-            query (${'$'}page: Int, ${'$'}perPage: Int, ${'$'}sort: [MediaSort], ${'$'}search: String, ${'$'}status: MediaStatus) {
-              Page(page: ${'$'}page, perPage: ${'$'}perPage) {
+            query ($page: Int, $perPage: Int, $sort: [MediaSort], $search: String, $status: MediaStatus) {
+              Page(page: $page, perPage: $perPage) {
                 pageInfo { currentPage hasNextPage }
-                media(type: ANIME, isAdult: false, sort: ${'$'}sort, search: ${'$'}search, status: ${'$'}status) {
+                media(type: ANIME, isAdult: false, sort: $sort, search: $search, status: $status) {
                   id
                   idMal
                   title { romaji english native userPreferred }
@@ -58,8 +57,8 @@ class AnimeRepository(context: Context) {
         """
 
         private const val DETAILS_MEDIA_QUERY = """
-            query (${'$'}id: Int) {
-              Media(id: ${'$'}id, type: ANIME) {
+            query ($id: Int) {
+              Media(id: $id, type: ANIME) {
                 id
                 idMal
                 title { romaji english native userPreferred }
@@ -79,8 +78,6 @@ class AnimeRepository(context: Context) {
             }
         """
     }
-
-    // ── Direct Official AniList GraphQL Queries (Trending, Popular, Recent, Search) ──
 
     suspend fun getTrending(page: Int = 1): AniListResult =
         queryAniListPage(page = page, sort = listOf("TRENDING_DESC", "POPULARITY_DESC"))
@@ -120,7 +117,8 @@ class AnimeRepository(context: Context) {
             val body = resp.body?.string() ?: return@withContext AniListResult()
             if (!resp.isSuccessful) return@withContext AniListResult()
 
-            val root = JsonParser.parseString(body).asJsonObject
+            val root = runCatching { gson.fromJson(body, JsonObject::class.java) }.getOrNull()
+                ?: return@withContext AniListResult()
             val pageObj = root.getAsJsonObject("data")?.getAsJsonObject("Page")
                 ?: return@withContext AniListResult()
 
@@ -158,9 +156,8 @@ class AnimeRepository(context: Context) {
         http.newCall(req).execute().use { resp ->
             val body = resp.body?.string() ?: return@withContext null
             if (!resp.isSuccessful) return@withContext null
-            val mediaObj = JsonParser.parseString(body).asJsonObject
-                .getAsJsonObject("data")
-                ?.getAsJsonObject("Media") ?: return@withContext null
+            val root = runCatching { gson.fromJson(body, JsonObject::class.java) }.getOrNull() ?: return@withContext null
+            val mediaObj = root.getAsJsonObject("data")?.getAsJsonObject("Media") ?: return@withContext null
 
             val base = parseAniListAnime(mediaObj)
             val totalEps = (base.totalEpisodes ?: 12).coerceAtLeast(1)
@@ -246,8 +243,6 @@ class AnimeRepository(context: Context) {
     private fun JsonElement?.asBooleanOrNull(): Boolean? =
         if (this != null && !this.isJsonNull) runCatching { this.asBoolean }.getOrNull() else null
 
-    // ── Detail Info + Provider Episode Mapping ───────────────────────────────
-
     suspend fun getAniListInfoWithProvider(
         id: String,
         preferredProvider: String = "animepahe",
@@ -278,8 +273,6 @@ class AnimeRepository(context: Context) {
         }
         throw Exception("Could not load anime details. Check your internet connection.")
     }
-
-    // ── High-Def 1080p / 720p / Auto Stream Resolution across Mirrors ────────
 
     suspend fun getHighDefStreams(
         episodeId: String,
