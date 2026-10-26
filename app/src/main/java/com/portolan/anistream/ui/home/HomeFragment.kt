@@ -24,8 +24,8 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, s)
         vm = ViewModelProvider(this)[HomeViewModel::class.java]
         b.rvTrending.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-        b.rvPopular.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-        b.rvRecent.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        b.rvPopular.layoutManager  = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        b.rvRecent.layoutManager   = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         b.rvContinue.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
 
         vm.loading.observe(viewLifecycleOwner) { b.progress.visibility = if (it) View.VISIBLE else View.GONE }
@@ -35,6 +35,9 @@ class HomeFragment : Fragment() {
         }
         vm.popular.observe(viewLifecycleOwner) { list ->
             b.rvPopular.adapter = AnimeCardAdapter(list) { openDetail(it.id, it.title?.display(), it.image, it.malId) }
+        }
+        vm.recent.observe(viewLifecycleOwner) { list ->
+            b.rvRecent.adapter = AnimeCardAdapter(list) { openDetail(it.id, it.title?.display(), it.image, it.malId) }
         }
         vm.continueWatching.observe(viewLifecycleOwner) { list ->
             b.rowContinue.visibility = if (list.isEmpty()) View.GONE else View.VISIBLE
