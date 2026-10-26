@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AniStream</string>
+    <string name="home">Home</string>
+    <string name="search">Search</string>
+    <string name="skip_op">Skip Opening</string>
+    <string name="skip_ed">Skip Ending</string>
+</resources>

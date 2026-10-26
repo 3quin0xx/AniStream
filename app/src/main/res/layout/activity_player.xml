@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000">
+
+    <!-- VLC renders here -->
+    <org.videolan.libvlc.util.VLCVideoLayout
+        android:id="@+id/vlcLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- Buffering spinner -->
+    <ProgressBar android:id="@+id/progress"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_gravity="center" android:visibility="gone" />
+
+    <!-- Error message -->
+    <TextView android:id="@+id/tvError"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_gravity="center" android:textColor="#FF5555"
+        android:textSize="16sp" android:visibility="gone" />
+
+    <!-- Skip OP button (bottom-right, appears during opening) -->
+    <Button android:id="@+id/btnSkipOp"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="24dp" android:layout_marginBottom="100dp"
+        android:text="⏭ Skip Opening"
+        android:textColor="#FFFFFF" android:backgroundTint="#BB000000"
+        android:focusable="true" android:visibility="gone" android:padding="12dp" />
+
+    <!-- Skip ED button -->
+    <Button android:id="@+id/btnSkipEd"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="24dp" android:layout_marginBottom="100dp"
+        android:text="⏭ Skip Ending"
+        android:textColor="#FFFFFF" android:backgroundTint="#BB000000"
+        android:focusable="true" android:visibility="gone" android:padding="12dp" />
+
+    <!-- Top bar -->
+    <LinearLayout android:id="@+id/topBar"
+        android:layout_width="match_parent" android:layout_height="56dp"
+        android:orientation="horizontal" android:background="#AA000000"
+        android:gravity="center_vertical" android:paddingHorizontal="16dp">
+
+        <TextView android:id="@+id/tvTitle"
+            android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_weight="1" android:textColor="#FFFFFF"
+            android:textSize="16sp" android:maxLines="1" android:ellipsize="end" />
+
+        <Button android:id="@+id/btnQuality"
+            android:layout_width="wrap_content" android:layout_height="36dp"
+            android:text="Auto" android:textColor="#FFFFFF"
+            android:backgroundTint="#AA333344" android:focusable="true" />
+
+    </LinearLayout>
+
+    <!-- Bottom controls -->
+    <LinearLayout android:id="@+id/bottomBar"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_gravity="bottom" android:orientation="vertical"
+        android:background="#AA000000" android:padding="12dp">
+
+        <!-- Seekbar row -->
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical">
+
+            <TextView android:id="@+id/tvCurrent"
+                android:layout_width="52dp" android:layout_height="wrap_content"
+                android:text="0:00" android:textColor="#FFFFFF" android:textSize="12sp" />
+
+            <SeekBar android:id="@+id/seekBar"
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:max="1000"
+                android:focusable="true" android:layout_marginHorizontal="6dp" />
+
+            <TextView android:id="@+id/tvTotal"
+                android:layout_width="52dp" android:layout_height="wrap_content"
+                android:text="0:00" android:textColor="#FFFFFF" android:textSize="12sp"
+                android:gravity="end" />
+
+        </LinearLayout>
+
+        <!-- Playback buttons -->
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center" android:layout_marginTop="4dp">
+
+            <Button android:id="@+id/btnRew"
+                android:layout_width="wrap_content" android:layout_height="48dp"
+                android:text="⏪ 10s" android:textColor="#FFFFFF"
+                android:backgroundTint="@android:color/transparent" android:focusable="true" />
+
+            <Button android:id="@+id/btnPlay"
+                android:layout_width="60dp" android:layout_height="60dp"
+                android:text="⏸" android:textSize="22sp" android:textColor="#FFFFFF"
+                android:backgroundTint="#AA444455" android:layout_marginHorizontal="20dp"
+                android:focusable="true" />
+
+            <Button android:id="@+id/btnFwd"
+                android:layout_width="wrap_content" android:layout_height="48dp"
+                android:text="30s ⏩" android:textColor="#FFFFFF"
+                android:backgroundTint="@android:color/transparent" android:focusable="true" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</FrameLayout>
