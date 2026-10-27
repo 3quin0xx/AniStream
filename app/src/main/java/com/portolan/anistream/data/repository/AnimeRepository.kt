@@ -32,51 +32,23 @@ class AnimeRepository(context: Context) {
             else        -> "https://gogoanime.tel/"
         }
 
-        private const val PAGE_MEDIA_QUERY = """
-            query ($page: Int, $perPage: Int, $sort: [MediaSort], $search: String, $status: MediaStatus) {
-              Page(page: $page, perPage: $perPage) {
-                pageInfo { currentPage hasNextPage }
-                media(type: ANIME, isAdult: false, sort: $sort, search: $search, status: $status) {
-                  id
-                  idMal
-                  title { romaji english native userPreferred }
-                  coverImage { extraLarge large }
-                  bannerImage
-                  description(asHtml: false)
-                  status
-                  averageScore
-                  seasonYear
-                  format
-                  genres
-                  episodes
-                  duration
-                  nextAiringEpisode { episode }
-                }
-              }
-            }
-        """
+        private const val PAGE_MEDIA_QUERY =
+            "query (\$page: Int, \$perPage: Int, \$sort: [MediaSort], \$search: String, \$status: MediaStatus) { " +
+            "Page(page: \$page, perPage: \$perPage) { " +
+            "pageInfo { currentPage hasNextPage } " +
+            "media(type: ANIME, isAdult: false, sort: \$sort, search: \$search, status: \$status) { " +
+            "id idMal title { romaji english native userPreferred } " +
+            "coverImage { extraLarge large } bannerImage description(asHtml: false) " +
+            "status averageScore seasonYear format genres episodes duration " +
+            "nextAiringEpisode { episode } } } }"
 
-        private const val DETAILS_MEDIA_QUERY = """
-            query ($id: Int) {
-              Media(id: $id, type: ANIME) {
-                id
-                idMal
-                title { romaji english native userPreferred }
-                coverImage { extraLarge large }
-                bannerImage
-                description(asHtml: false)
-                status
-                averageScore
-                seasonYear
-                format
-                genres
-                episodes
-                duration
-                nextAiringEpisode { episode }
-                streamingEpisodes { title thumbnail url }
-              }
-            }
-        """
+        private const val DETAILS_MEDIA_QUERY =
+            "query (\$id: Int) { " +
+            "Media(id: \$id, type: ANIME) { " +
+            "id idMal title { romaji english native userPreferred } " +
+            "coverImage { extraLarge large } bannerImage description(asHtml: false) " +
+            "status averageScore seasonYear format genres episodes duration " +
+            "nextAiringEpisode { episode } streamingEpisodes { title thumbnail url } } }"
     }
 
     suspend fun getTrending(page: Int = 1): AniListResult =
